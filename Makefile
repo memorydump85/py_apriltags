@@ -17,15 +17,15 @@ OBJFILES = tag36h11.o apriltag.o tag25h9.o apriltag_quad_thresh.o common/time_ut
            g2d.o
 
 
-all: apriltag.so
+all: apriltag_wrap.so
 
-apriltag.so: apriltag_wrap.o $(OBJFILES)
+apriltag_wrap.so: apriltag_wrap.o $(OBJFILES)
 	@echo "   $@"
 	@$(LD) -shared -o $@ *.o common/*.o
 
-apriltag_wrap.c: apriltag.pyx
+apriltag_wrap.c: apriltag_wrap.pyx
 	@echo "   $@"
-	@cython -o $@ -a apriltag.pyx
+	@cython -o $@ -a apriltag_wrap.pyx
 
 %.o: %.c
 	@echo "   $@"
