@@ -6,6 +6,7 @@ CFLAGS = -std=gnu99 -g -O3 -pthread \
          -Wall -Wno-unused-parameter -Wno-unused-function
 CFLAGS_APRILTAGS = -Icommon
 CFLAGS_PYTHON = `pkg-config --cflags python`
+CFLAGS_NUMPY = -I`python -c "import numpy; print numpy.get_include()"`
 
 LDFLAGS = -lpthread -lm
 LDFLAGS_PYTHON = `pkg-config --libs python`
@@ -29,7 +30,7 @@ apriltag_wrap.c: apriltag_wrap.pyx
 
 %.o: %.c
 	@echo "   $@"
-	@$(CC) -o $@ -c $< $(CFLAGS) $(CFLAGS_PYTHON) $(CFLAGS_APRILTAGS)
+	@$(CC) -o $@ -c $< $(CFLAGS) $(CFLAGS_NUMPY) $(CFLAGS_PYTHON) $(CFLAGS_APRILTAGS)
 
 .PHONY: clean
 clean:
