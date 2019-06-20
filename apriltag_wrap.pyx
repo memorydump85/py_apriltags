@@ -3,7 +3,8 @@ import numpy as np
 
 cimport cpython
 cimport numpy as np
-from cpython.cobject cimport PyCObject_FromVoidPtr, PyCObject_AsVoidPtr
+from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
+
 
 
 #
@@ -16,8 +17,8 @@ cdef extern from "zarray.h":
     ctypedef struct zarray_t:
         pass
 
-    inline int zarray_size(const zarray_t *za)
-    inline void zarray_get(const zarray_t *za, int idx, void *p)
+    int zarray_size(const zarray_t *za)
+    void zarray_get(const zarray_t *za, int idx, void *p)
 
 
 #--------------------------------------
@@ -175,7 +176,7 @@ class AprilTagDetector(object):
             raise Exception("Unrecognized tag family name: " + tagfamily)
 
         tf_.black_border = border_size
-        self.tf = PyCObject_FromVoidPtr(tf_, NULL)
+        self.tf = PyCapsule_New(tf_, b'AprilTagDetector.tf', NULL)
 
         cdef apriltag_detector_t *td_
         td_ = apriltag_detector_create()
@@ -186,16 +187,16 @@ class AprilTagDetector(object):
         td_.refine_edges = refine_edges
         td_.refine_decode = refine_decode
         td_.refine_pose = refine_pose
-        self.td = PyCObject_FromVoidPtr(td_, NULL)
+        self.td = PyCapsule_New(td_, b'AprilTagDetector.td', NULL)
 
         apriltag_detector_add_family(td_, tf_)
 
 
     def __del__(self):
-        apriltag_detector_destroy(<apriltag_detector_t *>PyCObject_AsVoidPtr(self.td))
+        apriltag_detector_destroy(<apriltag_detector_t *>PyCapsule_GetPointer(self.td, b'AprilTagDetector.td'))
 
         cdef apriltag_family_t *tf_
-        tf_ = <apriltag_family_t*>PyCObject_AsVoidPtr(self.tf)
+        tf_ = <apriltag_family_t*>PyCapsule_GetPointer(self.tf, b'AprilTagDetector.tf')
         if self.tagfamily == "tag36h11":
             tag36h11_destroy(tf_)
         elif self.tagfamily == "tag36h10":
@@ -213,7 +214,7 @@ class AprilTagDetector(object):
         im_u8 = image_u8_create_from_ndarray(im)
 
         cdef apriltag_detector_t *td_
-        td_ = <apriltag_detector_t*>PyCObject_AsVoidPtr(self.td)
+        td_ = <apriltag_detector_t*>PyCapsule_GetPointer(self.td, b'AprilTagDetector.td')
 
         cdef zarray_t *c_detections
         c_detections = apriltag_detector_detect(td_, im_u8)

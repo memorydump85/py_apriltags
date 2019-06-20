@@ -5,11 +5,11 @@ CFLAGS = -std=gnu99 -g -O3 -pthread \
          -fPIC -fwrapv -fno-strict-aliasing \
          -Wall -Wno-unused-parameter -Wno-unused-function
 CFLAGS_APRILTAGS = -Icommon
-CFLAGS_PYTHON = `pkg-config --cflags python`
-CFLAGS_NUMPY = -I`python -c "import numpy; print numpy.get_include()"`
+CFLAGS_PYTHON = `pkg-config --cflags python3`
+CFLAGS_NUMPY = -I`python3 -c "import numpy; print(numpy.get_include())"`
 
 LDFLAGS = -lpthread -lm
-LDFLAGS_PYTHON = `pkg-config --libs python`
+LDFLAGS_PYTHON = `pkg-config --libs python3`
 OBJFILES = tag36h11.o apriltag.o tag25h9.o apriltag_quad_thresh.o common/time_util.o \
            common/pnm.o common/matd.o common/unionfind.o common/svd22.o common/zhash.o \
            common/getopt.o common/string_util.o common/workerpool.o common/zmaxheap.o \
@@ -26,7 +26,7 @@ apriltag_wrap.so: apriltag_wrap.o $(OBJFILES)
 
 apriltag_wrap.c: apriltag_wrap.pyx
 	@echo "   $@"
-	@cython -o $@ -a apriltag_wrap.pyx
+	@cython3 -3 -o $@ -a apriltag_wrap.pyx
 
 %.o: %.c
 	@echo "   $@"
